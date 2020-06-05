@@ -80,17 +80,7 @@ public class TrailmakingController : MonoBehaviour
             }
         }
         taskInitialized = true;
-        for (int i=0;i<targets.Count;i++)
-        {
-            Vector3 targetPos = Camera.main.ScreenToWorldPoint(targets[i].transform.position);
-            string output = "Target "+(i+1).ToString()+ ":";
-            for (int x = 0; x< 3; x++)
-            {
-                output += targetPos[x].ToString("f4");
-                if (x < 2) output += ",";
-            }
-            print(output);
-        }
+       
     }
 
      public void renderTask(List<Vector3> targetPositions, int start, int count, bool prLetters)

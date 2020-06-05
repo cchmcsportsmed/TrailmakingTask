@@ -5,6 +5,6 @@ using UnityEngine;
 [System.Serializable]
 public class TaskData
 {
-    public List<dataStore> taskDataLisT = new List<dataStore>();
+    public List<dataStore> Items = new List<dataStore>();
     
 }

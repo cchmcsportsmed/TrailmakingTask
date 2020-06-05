@@ -10,7 +10,7 @@ public class LoadData : MonoBehaviour
     //    private TextAsset datafile; 
 
     public string path;
-    public string filename = "Data.json";
+    public string filename = "Data2.json";
     // Start is called before the first frame update
     public TrailmakingController controller;
     TaskData taskData = new TaskData();
@@ -25,42 +25,37 @@ public class LoadData : MonoBehaviour
     {
         // path = Application.persistentDataPath + "/" + filename;
         path = "/home/quest/Drive/CCHMC/Codes/TrailMaking Task/TrailmakingTask/Assets/" + filename;
-        print(path);
-        // pracTask_A.count=controller.targetPos_PA.Count;
-        // pracTask_B.count=controller.targetPos_PB.Count;
-        // Task_A.count=controller.targetPos.Count;
-        // Task_B.count=controller.targetPosTaskB.Count;
-        
+
+        // SaveData();
+        // initialDataGeneration();
+        ReadData();
+    }
+
+    void initialDataGeneration()
+    {
         pracTask_A.task_name="Practice Task A";
         pracTask_B.task_name="Practice Task B";
         Task_A.task_name="Task A";
-        Task_A.task_name="Task A";
+        Task_B.task_name="Task B";
+        userTask_A.task_name="User Task A";
+        userTask_B.task_name="User Task B";
 
         pracTask_A.positions=controller.targetPos_PA;
         pracTask_B.positions=controller.targetPos_PB;
         Task_A.positions=controller.targetPos;
         Task_B.positions=controller.targetPosTaskB;
+        userTask_A.positions=Task_A.positions;
+        userTask_B.positions=Task_B.positions;
 
-        // taskData.pracTask_A=pracTask_A;
-        
-        
-        
-
-        taskData.taskDataList.Add(pracTask_A);
-        taskData.taskDataList.Add(pracTask_B);
-        taskData.taskDataList.Add(Task_A);
-        taskData.taskDataList.Add(Task_B);
-
-        // for(int i=0;i<pracTask_A.positions.Count;i++)
-        // {
-        //     print(pracTask_A.positions[i]);
-        // }
+        taskData.Items.Add(pracTask_A);
+        taskData.Items.Add(pracTask_B);
+        taskData.Items.Add(Task_A);
+        taskData.Items.Add(Task_B);
+        taskData.Items.Add(userTask_A);
+        taskData.Items.Add(userTask_B);
         SaveData();
-
-        // ReadData();
     }
-
-
+    
     void SaveData()
     {
         string contents = JsonUtility.ToJson(taskData, true);
@@ -69,11 +64,14 @@ public class LoadData : MonoBehaviour
     }
 
     void ReadData()
-    {
-        // string contents = System.IO.File.ReadAllText(path);
-        // taskData = JsonUtility.FromJson<TaskData>(contents);
-        // print(taskData.count);
-
+    {   
+        dataStore[] dataS = new dataStore[6];
+        string contents = System.IO.File.ReadAllText(path);
+        dataS = JsonHelper.FromJson<dataStore>(contents);
+        for(int i =0; i<6; i++)
+        {
+            print(dataS[i].task_name);
+        }
     }
     
 }
