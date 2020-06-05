@@ -17,10 +17,6 @@ public class GUIController : MonoBehaviour {
         statusMsg.gameObject.SetActive(true);
         yield return new WaitForSeconds(duration);
         statusMsg.gameObject.SetActive(false);
-        // overlayText.text = text;
-        // overlay.SetActive(true);
-        // yield return new WaitForSeconds(duration);
-        // overlay.SetActive(false);
     }
     public void startTask(int taskID)
     {

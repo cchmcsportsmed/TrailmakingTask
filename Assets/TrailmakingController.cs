@@ -17,7 +17,7 @@ public class TrailmakingController : MonoBehaviour
     public LayerMask raycastMask;
     StringBuilder data;
     public List<GameObject> targets;
-    public List<Vector3> targetPos;
+    public List<Vector3> targetPosTaskA;
     public List<Vector3> targetPosTaskB;
     public List<Vector3> targetPos_PA;
     public List<Vector3> targetPos_PB;
@@ -31,8 +31,22 @@ public class TrailmakingController : MonoBehaviour
     public List<GameObject> hitTargets;
     List<string> letters  = new List<string> { "A", "B", "C", "D", "E", "F", "G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
     // Use this for initialization
-    public void startTask()
+    public LoadData dataLoader;
+    
+    public void initialize()
     {
+        dataStore[] dataS = new dataStore[6];
+        dataS=dataLoader.ReadData();
+        targetPosTaskA=dataS[2].positions;
+        targetPosTaskB=dataS[3].positions;
+        targetPos_PA=dataS[0].positions;
+        targetPos_PB=dataS[1].positions;
+        //targetPosTaskA=dataS[4].positions;
+        //targetPosTaskA=dataS[5].positions;
+    }
+    public void startTask()
+    {   
+        initialize();
         taskStarted = false;
         taskTime = 0;
         canStart = true;
@@ -43,7 +57,7 @@ public class TrailmakingController : MonoBehaviour
         {
             // Task A
             case 0:{
-                renderTask(targetPos,0,targetPos.Count,false);
+                renderTask(targetPosTaskA,0,targetPosTaskA.Count,false);
                 break;
         }
             // Task B
@@ -158,7 +172,7 @@ public class TrailmakingController : MonoBehaviour
                                 if (targetText != null)
                                 {
                                     int numTargets;
-                                    if (currentTask == 0) { numTargets = targetPos.Count; }
+                                    if (currentTask == 0) { numTargets = targetPosTaskA.Count; }
                                     else if (currentTask == 1) { numTargets = targetPosTaskB.Count; }
                                     else if (currentTask == 2) { numTargets = targetPos_PA.Count; }
                                     else if (currentTask == 3) { numTargets = targetPos_PB.Count; }

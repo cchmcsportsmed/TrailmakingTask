@@ -25,13 +25,12 @@ public class LoadData : MonoBehaviour
     {
         // path = Application.persistentDataPath + "/" + filename;
         path = "/home/quest/Drive/CCHMC/Codes/TrailMaking Task/TrailmakingTask/Assets/" + filename;
-
         // SaveData();
         // initialDataGeneration();
         ReadData();
     }
 
-    void initialDataGeneration()
+    public void initialDataGeneration()
     {
         pracTask_A.task_name="Practice Task A";
         pracTask_B.task_name="Practice Task B";
@@ -42,7 +41,7 @@ public class LoadData : MonoBehaviour
 
         pracTask_A.positions=controller.targetPos_PA;
         pracTask_B.positions=controller.targetPos_PB;
-        Task_A.positions=controller.targetPos;
+        Task_A.positions=controller.targetPosTaskA;
         Task_B.positions=controller.targetPosTaskB;
         userTask_A.positions=Task_A.positions;
         userTask_B.positions=Task_B.positions;
@@ -56,22 +55,20 @@ public class LoadData : MonoBehaviour
         SaveData();
     }
     
-    void SaveData()
+    public void SaveData()
     {
         string contents = JsonUtility.ToJson(taskData, true);
         System.IO.File.WriteAllText(path , contents);
 
     }
 
-    void ReadData()
+    public dataStore[] ReadData()
     {   
         dataStore[] dataS = new dataStore[6];
         string contents = System.IO.File.ReadAllText(path);
         dataS = JsonHelper.FromJson<dataStore>(contents);
-        for(int i =0; i<6; i++)
-        {
-            print(dataS[i].task_name);
-        }
+        return(dataS);
+        
     }
     
 }
