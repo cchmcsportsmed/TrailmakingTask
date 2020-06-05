@@ -144,7 +144,8 @@ public class TrailmakingController : MonoBehaviour
                 {
                     mouseObj.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
                     taskTime += Time.deltaTime;
-                    writer.addToCSV(taskTime.ToString() + "," + mouseObj.transform.position.x.ToString() + "," + mouseObj.transform.position.y.ToString() + "\n");
+                    // writer.addToCSV(taskTime.ToString() + "," + mouseObj.transform.position.x.ToString() + "," + mouseObj.transform.position.y.ToString() + "\n");
+                    writer.addToCSV(taskTime.ToString() + "," + Input.mousePosition.x + "," + Input.mousePosition.y.ToString() + "\n"); // save cursor coordiantes in current frame to the output
                     string output = "";
                     for (int i = 0; i < 3; i++)
                     {
