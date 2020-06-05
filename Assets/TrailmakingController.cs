@@ -39,102 +39,30 @@ public class TrailmakingController : MonoBehaviour
         data = new StringBuilder();
         hitTargets = new List<GameObject>();
         mouseObj.GetComponent<TrailRenderer>().Clear();
-        if (currentTask ==0)
+        switch (currentTask)
         {
-            targets = new List<GameObject>();
-            for (int i = 0; i < targetPos.Count; i++)
-            {
-                GameObject newTarget = Instantiate(targetPrefab);
-                Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-                //Target Text
-                targetText.text = (i + 1).ToString();
-                //Target Position
-                Vector3 newTargetPos = Vector3.zero;
-                newTargetPos = targetPos[i];
-                newTargetPos.z = Camera.main.nearClipPlane;
-                newTarget.transform.position = newTargetPos;
-                newTarget.transform.parent = canvas.transform;
-                targets.Add(newTarget);
-            }
+            // Task A
+            case 0:{
+                renderTask(targetPos,0,targetPos.Count,false);
+                break;
         }
-        else if (currentTask ==1)
-        {
-            for (int i = 0; i < taskBNumbers; i++)
-            {
-                GameObject newTarget = Instantiate(targetPrefab);
-                Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-                //Target Text
-                targetText.text = (i + 1).ToString();
-                //Target Position
-                Vector3 newTargetPos = Vector3.zero;
-                newTargetPos = targetPosTaskB[i];
-                newTargetPos.z = Camera.main.nearClipPlane;
-                newTarget.transform.position = newTargetPos;
-                newTarget.transform.parent = canvas.transform;
-                targets.Add(newTarget);
+            // Task B
+            case 1:{
+                
+                renderTask(targetPosTaskB,0,taskBNumbers,false);
+                renderTask(targetPosTaskB,taskBNumbers,targetPosTaskB.Count,true);
+                break;
             }
-            for (int i = 0; i < targetPosTaskB.Count - taskBNumbers; i++)
-            {
-                GameObject newTarget = Instantiate(targetPrefab);
-                Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-                //Target Text
-                targetText.text = letters[i];
-                //Target Position
-                Vector3 newTargetPos = Vector3.zero;
-                newTargetPos = targetPosTaskB[taskBNumbers+i];
-                newTargetPos.z = Camera.main.nearClipPlane;
-                newTarget.transform.position = newTargetPos;
-                newTarget.transform.parent = canvas.transform;
-                targets.Add(newTarget);
+            // Practise Task A
+            case 2:{
+                renderTask(targetPos_PA,0,targetPos_PA.Count,false);
+                break;
             }
-        }
-        else if (currentTask == 2)
-            {
-                targets = new List<GameObject>();
-                for (int i = 0; i < targetPos_PA.Count; i++)
-                {
-                    GameObject newTarget = Instantiate(targetPrefab);
-                    Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-                    //Target Text
-                    targetText.text = (i + 1).ToString();
-                    //Target Position
-                    Vector3 newTargetPos = Vector3.zero;
-                    newTargetPos = targetPos_PA[i];
-                    newTargetPos.z = Camera.main.nearClipPlane;
-                    newTarget.transform.position = newTargetPos;
-                    newTarget.transform.parent = canvas.transform;
-                    targets.Add(newTarget);
-                }
-            }
-        else if (currentTask == 3)
-        {
-            for (int i = 0; i < (taskBNumbers/3); i++)
-            {
-                GameObject newTarget = Instantiate(targetPrefab);
-                Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-                //Target Text
-                targetText.text = (i + 1).ToString();
-                //Target Position
-                Vector3 newTargetPos = Vector3.zero;
-                newTargetPos = targetPos_PB[i];
-                newTargetPos.z = Camera.main.nearClipPlane;
-                newTarget.transform.position = newTargetPos;
-                newTarget.transform.parent = canvas.transform;
-                targets.Add(newTarget);
-            }
-            for (int i = 0; i < targetPos_PB.Count - (taskBNumbers / 3); i++)
-            {
-                GameObject newTarget = Instantiate(targetPrefab);
-                Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-                //Target Text
-                targetText.text = letters[i];
-                //Target Position
-                Vector3 newTargetPos = Vector3.zero;
-                newTargetPos = targetPos_PB[(taskBNumbers / 3) + i];
-                newTargetPos.z = Camera.main.nearClipPlane;
-                newTarget.transform.position = newTargetPos;
-                newTarget.transform.parent = canvas.transform;
-                targets.Add(newTarget);
+            // Practise Task B
+            case 3:{
+                renderTask(targetPos_PB,0,taskBNumbers/3,false);
+                renderTask(targetPos_PB,taskBNumbers/3,targetPos_PB.Count,true);
+                break;
             }
         }
         writer.createFile();
@@ -163,6 +91,28 @@ public class TrailmakingController : MonoBehaviour
             }
             print(output);
         }
+    }
+
+     public void renderTask(List<Vector3> targetPositions, int start, int count, bool prLetters)
+    {
+        targets = new List<GameObject>();
+        for (int i = start; i < count; i++)
+        {
+            GameObject newTarget = Instantiate(targetPrefab);
+            Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
+            
+            //Target Text
+            if (prLetters)            {targetText.text = letters[i-start];}  // prints letters
+            else            {targetText.text = (i + 1).ToString();}          //prints numbers
+            
+            //Target Position
+            Vector3 newTargetPos = Vector3.zero;
+            newTargetPos = targetPositions[i];
+            newTargetPos.z = Camera.main.nearClipPlane;
+            newTarget.transform.position = newTargetPos;
+            newTarget.transform.SetParent( canvas.transform);
+            targets.Add(newTarget);
+        } 
     }
     public IEnumerator endTask()
     {
