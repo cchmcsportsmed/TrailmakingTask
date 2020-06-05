@@ -8,15 +8,19 @@ public class GUIController : MonoBehaviour {
     public string subjectID = "";
     public GameObject canvas;
     public TrailmakingController task;
-    public GameObject overlay;
-    public Text overlayText;
+    public Text statusMsg;
+
     // Use this for initialization
     public IEnumerator showOverlay(float duration, string text)
     {
-        overlayText.text = text;
-        overlay.SetActive(true);
+        statusMsg.text = text;
+        statusMsg.gameObject.SetActive(true);
         yield return new WaitForSeconds(duration);
-        overlay.SetActive(false);
+        statusMsg.gameObject.SetActive(false);
+        // overlayText.text = text;
+        // overlay.SetActive(true);
+        // yield return new WaitForSeconds(duration);
+        // overlay.SetActive(false);
     }
     public void startTask(int taskID)
     {
