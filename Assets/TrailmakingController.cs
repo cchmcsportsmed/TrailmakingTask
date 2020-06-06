@@ -32,53 +32,26 @@ public class TrailmakingController : MonoBehaviour
     List<string> letters  = new List<string> { "A", "B", "C", "D", "E", "F", "G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
     // Use this for initialization
     public LoadData dataLoader;
+    public dataStore[] dataS = new dataStore[6];
     
-    public void initialize()
-    {
-        dataStore[] dataS = new dataStore[6];
-        dataS=dataLoader.ReadData();
-        targetPosTaskA=dataS[2].positions;
-        targetPosTaskB=dataS[3].positions;
-        targetPos_PA=dataS[0].positions;
-        targetPos_PB=dataS[1].positions;
-        //targetPosTaskA=dataS[4].positions;
-        //targetPosTaskA=dataS[5].positions;
-    }
     public void startTask()
     {   
-        initialize();
+        dataS = dataLoader.ReadData();
         taskStarted = false;
         taskTime = 0;
         canStart = true;
         data = new StringBuilder();
         hitTargets = new List<GameObject>();
         mouseObj.GetComponent<TrailRenderer>().Clear();
-        switch (currentTask)
-        {
-            // Task A
-            case 0:{
-                renderTask(targetPosTaskA,0,targetPosTaskA.Count,false);
-                break;
-        }
-            // Task B
-            case 1:{
-                
-                renderTask(targetPosTaskB,0,taskBNumbers,false);
-                renderTask(targetPosTaskB,taskBNumbers,targetPosTaskB.Count,true);
-                break;
-            }
-            // Practise Task A
-            case 2:{
-                renderTask(targetPos_PA,0,targetPos_PA.Count,false);
-                break;
-            }
-            // Practise Task B
-            case 3:{
-                renderTask(targetPos_PB,0,taskBNumbers/3,false);
-                renderTask(targetPos_PB,taskBNumbers/3,targetPos_PB.Count,true);
-                break;
-            }
-        }
+        // Render targets 
+        Targets TaskTargets = new Targets();
+        TaskTargets.currentTask = currentTask;
+        TaskTargets.targetPositions = dataS[currentTask].positions;
+        TaskTargets.canvas = canvas;
+        TaskTargets.targetPrefab = targetPrefab;
+        TaskTargets.render();
+        targets = TaskTargets.targets;
+
         writer.createFile();
         //writer.setFileName(fileName);
         foreach (string item in header)
@@ -94,30 +67,8 @@ public class TrailmakingController : MonoBehaviour
             }
         }
         taskInitialized = true;
-       
     }
 
-     public void renderTask(List<Vector3> targetPositions, int start, int count, bool prLetters)
-    {
-        targets = new List<GameObject>();
-        for (int i = start; i < count; i++)
-        {
-            GameObject newTarget = Instantiate(targetPrefab);
-            Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-            
-            //Target Text
-            if (prLetters)            {targetText.text = letters[i-start];}  // prints letters
-            else            {targetText.text = (i + 1).ToString();}          //prints numbers
-            
-            //Target Position
-            Vector3 newTargetPos = Vector3.zero;
-            newTargetPos = targetPositions[i];
-            newTargetPos.z = Camera.main.nearClipPlane;
-            newTarget.transform.position = newTargetPos;
-            newTarget.transform.SetParent( canvas.transform);
-            targets.Add(newTarget);
-        } 
-    }
     public IEnumerator endTask()
     {
         yield return gui.showOverlay(3, "Task Completed");
@@ -140,7 +91,6 @@ public class TrailmakingController : MonoBehaviour
             {
                 if (!taskStarted && canStart)
                 {
-                    //print("Go!");
                     taskStarted = true;
                     canStart = false;
                 }
@@ -171,16 +121,10 @@ public class TrailmakingController : MonoBehaviour
                                 hitTargets.Add(hit.collider.gameObject);
                                 if (targetText != null)
                                 {
-                                    int numTargets;
-                                    if (currentTask == 0) { numTargets = targetPosTaskA.Count; }
-                                    else if (currentTask == 1) { numTargets = targetPosTaskB.Count; }
-                                    else if (currentTask == 2) { numTargets = targetPos_PA.Count; }
-                                    else if (currentTask == 3) { numTargets = targetPos_PB.Count; }
-                                    else { numTargets = 1; }
-                                    //print(targetText.text);
+                                    int numTargets = 1;
+                                    numTargets = targets.Count;
                                     if (hitTargets.Count == numTargets)
                                     {
-                                        //print("Hit final target.");
                                         StartCoroutine(endTask());
                                     }
                                 }

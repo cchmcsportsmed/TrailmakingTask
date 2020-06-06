@@ -6,7 +6,8 @@ using UnityEngine.UI;
 public class GUIController : MonoBehaviour {
 
     public string subjectID = "";
-    public GameObject canvas;
+    public GameObject UserPanel;
+    public GameObject ControlPanel;
     public TrailmakingController task;
     public Text statusMsg;
 
@@ -25,7 +26,7 @@ public class GUIController : MonoBehaviour {
             task.currentTask = taskID;
            
             task.writer.trialID+=1;
-            canvas.SetActive(false);
+            UserPanel.SetActive(false);
             task.writer.setFileName();
             task.startTask();
         }
@@ -39,8 +40,20 @@ public class GUIController : MonoBehaviour {
     }
     public void showGUI()
     {
-        canvas.SetActive(true);
+        UserPanel.SetActive(true);
     }
-    
+     public void showSettings()
+    {
+        if(ControlPanel.activeSelf)
+        {
+            ControlPanel.SetActive(false);    
+        } 
+        else
+        {
+            ControlPanel.SetActive(true);
+        }
+        
+    }
 
 }
+   
