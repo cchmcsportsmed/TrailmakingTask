@@ -8,6 +8,7 @@ public class GUIController : MonoBehaviour {
     public string subjectID = "";
     public GameObject UserPanel;
     public GameObject ControlPanel;
+    public GameObject GamePanel;
     public TrailmakingController task;
     public Text statusMsg;
 
@@ -27,6 +28,7 @@ public class GUIController : MonoBehaviour {
            
             task.writer.trialID+=1;
             UserPanel.SetActive(false);
+            // GamePanel.SetActive(true);
             task.writer.setFileName();
             task.startTask();
         }
@@ -41,16 +43,19 @@ public class GUIController : MonoBehaviour {
     public void showGUI()
     {
         UserPanel.SetActive(true);
+        // GamePanel.SetActive(false);
     }
      public void showSettings()
     {
         if(ControlPanel.activeSelf)
         {
-            ControlPanel.SetActive(false);    
+            ControlPanel.SetActive(false);
+            UserPanel.SetActive(true);    
         } 
         else
         {
             ControlPanel.SetActive(true);
+            UserPanel.SetActive(false);
         }
         
     }

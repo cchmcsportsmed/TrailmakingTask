@@ -10,6 +10,7 @@ public class Targets
     public GameObject targetPrefab;
     public List<GameObject> targets;
     public Canvas canvas;
+    public GameObject panel;
     List<string> letters  = new List<string> { "A", "B", "C", "D", "E", "F", "G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
 
     public void render()
@@ -37,8 +38,8 @@ public class Targets
             Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
             
             //Target Text
-            if (prLetters)            {targetText.text = letters[i-start];}  // prints letters
-            else            {targetText.text = (i + 1).ToString();}          //prints numbers
+            if (prLetters)  {targetText.text = letters[i-start];}  // prints letters
+            else    {targetText.text = (i + 1).ToString();}          //prints numbers
      
             //Target Position
             Vector3 newTargetPos = Vector3.zero;

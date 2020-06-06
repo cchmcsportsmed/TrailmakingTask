@@ -11,6 +11,7 @@ public class TrailmakingController : MonoBehaviour
     public List<float> yRange;
     public GameObject mouseObj;
     public Canvas canvas;
+    public GameObject GamePanel;
     public float taskTime;
     bool taskStarted;
     bool canStart = true;
@@ -33,6 +34,9 @@ public class TrailmakingController : MonoBehaviour
     // Use this for initialization
     public LoadData dataLoader;
     public dataStore[] dataS = new dataStore[6];
+    public bool designmode = false;
+
+    public int NumPoints;
     
     public void startTask()
     {   
@@ -43,11 +47,24 @@ public class TrailmakingController : MonoBehaviour
         data = new StringBuilder();
         hitTargets = new List<GameObject>();
         mouseObj.GetComponent<TrailRenderer>().Clear();
+        taskInitialized = true;
+
         // Render targets 
         Targets TaskTargets = new Targets();
         TaskTargets.currentTask = currentTask;
-        TaskTargets.targetPositions = dataS[currentTask].positions;
+        
+        List<Vector3> pattern = dataS[currentTask].positions;
+        TaskTargets.targetPositions = pattern;
+
+        if (designmode)
+        {
+            int i =NumPoints;
+            pattern.RemoveRange(NumPoints, pattern.Count - NumPoints);
+            taskInitialized = false;
+        }
+        
         TaskTargets.canvas = canvas;
+        TaskTargets.panel = GamePanel;
         TaskTargets.targetPrefab = targetPrefab;
         TaskTargets.render();
         targets = TaskTargets.targets;
@@ -66,27 +83,41 @@ public class TrailmakingController : MonoBehaviour
                 writer.addToCSV("\n");
             }
         }
-        taskInitialized = true;
+        
+        
     }
-
-    public IEnumerator endTask()
+    
+    public void clearframe()
     {
-        yield return gui.showOverlay(3, "Task Completed");
-        taskStarted = false;
-        writer.saveData();
-        taskInitialized = false;
-        while (targets.Count > 0)
+         while (targets.Count > 0)
         {
             GameObject target = targets[0];
             targets.RemoveAt(0);
             Destroy(target);
         }
         mouseObj.GetComponent<TrailRenderer>().Clear();
+    }
+    public IEnumerator endTask()
+    {
+        yield return gui.showOverlay(3, "Task Completed");
+        taskStarted = false;
+        writer.saveData();
+        taskInitialized = false;
+        clearframe();
+        // while (targets.Count > 0)
+        // {
+        //     GameObject target = targets[0];
+        //     targets.RemoveAt(0);
+        //     Destroy(target);
+        // }
+        // mouseObj.GetComponent<TrailRenderer>().Clear();
         gui.showGUI();
     }
     // Update is called once per frame
     void Update()
-    {if (taskInitialized) {
+    {
+        if (taskInitialized) 
+        {
             if (Input.GetMouseButton(0))
             {
                 if (!taskStarted && canStart)
@@ -133,6 +164,11 @@ public class TrailmakingController : MonoBehaviour
                     }
                 }
             }
+        }
+
+        if (designmode)
+        {
+            print("Yipee");
         }
     }
 }
