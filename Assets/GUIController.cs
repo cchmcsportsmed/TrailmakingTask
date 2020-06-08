@@ -11,6 +11,7 @@ public class GUIController : MonoBehaviour {
     public GameObject GamePanel;
     public TrailmakingController task;
     public Text statusMsg;
+    public int customDesign = 0;
 
     // Use this for initialization
     public IEnumerator showOverlay(float duration, string text)
@@ -22,13 +23,14 @@ public class GUIController : MonoBehaviour {
     }
     public void startTask(int taskID)
     {
+        bool toggle = this.transform.Find("UserPanel/customDesign").gameObject.GetComponent<Toggle>().isOn;
+        if(toggle) {customDesign = 2;} else {customDesign = 0;}; 
         if (subjectID != "")
         {
-            task.currentTask = taskID;
+            task.currentTask = taskID + customDesign;
            
             task.writer.trialID+=1;
             UserPanel.SetActive(false);
-            // GamePanel.SetActive(true);
             task.writer.setFileName();
             task.startTask();
         }
@@ -43,7 +45,6 @@ public class GUIController : MonoBehaviour {
     public void showGUI()
     {
         UserPanel.SetActive(true);
-        // GamePanel.SetActive(false);
     }
      public void showSettings()
     {

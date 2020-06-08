@@ -11,6 +11,7 @@ public class PatternGenerator : MonoBehaviour
     public GameObject targetPrefab;
     public List<GameObject> targets;
     public LoadData dataLoader;
+    
 
     public TrailmakingController design;
 
@@ -32,6 +33,7 @@ public class PatternGenerator : MonoBehaviour
 
         public void SaveDesign()
     {
+        design.saveDesign = true;
 
     }
         public void ClearDesign()

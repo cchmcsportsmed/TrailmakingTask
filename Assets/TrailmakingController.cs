@@ -43,10 +43,12 @@ public class TrailmakingController : MonoBehaviour
     float zPos;
     float startposX;
     float startposy;
+    public bool saveDesign = false;
     
     public void startTask()
     {   
-        dataS = dataLoader.ReadData();
+        dataS = dataLoader.dataS;
+        print(dataS[currentTask].positions.Count);
         taskStarted = false;
         taskTime = 0;
         canStart = true;
@@ -59,7 +61,8 @@ public class TrailmakingController : MonoBehaviour
         Targets TaskTargets = new Targets();
         TaskTargets.currentTask = currentTask;
         
-        List<Vector3> pattern = dataS[currentTask].positions;
+        List<Vector3> pattern = new List<Vector3>(dataS[currentTask].positions); // create a new list.
+        // pattern = dataS[currentTask].positions;
         TaskTargets.targetPositions = pattern;
 
         if (designmode)
@@ -67,8 +70,10 @@ public class TrailmakingController : MonoBehaviour
             int i =NumPoints;
             pattern.RemoveRange(NumPoints, pattern.Count - NumPoints);
             taskInitialized = false;
+            
         }
-        
+        print(dataS[currentTask].positions.Count);
+
         TaskTargets.canvas = canvas;
         TaskTargets.panel = GamePanel;
         TaskTargets.targetPrefab = targetPrefab;
@@ -89,8 +94,6 @@ public class TrailmakingController : MonoBehaviour
                 writer.addToCSV("\n");
             }
         }
-        
-        
     }
     
     public void clearframe()
@@ -110,18 +113,28 @@ public class TrailmakingController : MonoBehaviour
         writer.saveData();
         taskInitialized = false;
         clearframe();
-        // while (targets.Count > 0)
-        // {
-        //     GameObject target = targets[0];
-        //     targets.RemoveAt(0);
-        //     Destroy(target);
-        // }
-        // mouseObj.GetComponent<TrailRenderer>().Clear();
         gui.showGUI();
     }
+    
+    public void saveTask()
+    {
+        int ix = 2+currentTask;
+        print(ix);
+        print("saved");
+        // yield return gui.showOverlay(3, "New task design saved");
+        dataS[ix].positions.Clear();
+        foreach(GameObject target in targets)
+        {
+            dataS[ix].positions.Add(target.transform.position);
+        }
+        targets.Clear();
+        dataLoader.SaveData();
+    }
+    
     // Update is called once per frame
     void Update()
     {
+        //play mode
         if (taskInitialized) 
         {
             if (Input.GetMouseButton(0))
@@ -171,7 +184,7 @@ public class TrailmakingController : MonoBehaviour
                 }
             }
         }
-
+        // design level
         if (designmode)
         {
             Vector3 mousePos;
@@ -185,7 +198,7 @@ public class TrailmakingController : MonoBehaviour
             
                 if (Physics.Raycast(ray, out hit, raycastMask) && Input.GetMouseButton(0))
                 {   
-                    print("Hit Target");
+                    // print("Hit Target");
                     desObject = hit.collider.gameObject; 
 
 
@@ -198,7 +211,7 @@ public class TrailmakingController : MonoBehaviour
                     startposX=mousePos.x - desObject.transform.position.x;
                     startposy=mousePos.y - desObject.transform.position.y;
 
-                    print("zPos = "+zPos);
+                    // print("zPos = "+zPos);
                 }
             }
             else
@@ -208,17 +221,17 @@ public class TrailmakingController : MonoBehaviour
                         mousePos.z = zPos;
                         mousePos = Camera.main.ScreenToWorldPoint(mousePos);
                         desObject.transform.position = new Vector3(mousePos.x - startposX, mousePos.y - startposy, zPos + Camera.main.transform.position.z);                    
-
-                        // print("Name : " + desObject.name + " Position: " +desObject.transform.position);
-                        print(" Target Locked and Current Mousr position : " + Input.mousePosition + " and In world : "+ mousePos.ToString("f8"));
                     }
-                    else
-                    {
-                        isHeld = false;
-                    } 
+                    else    {isHeld = false;} 
             }
 
-    }
+            if (saveDesign == true)
+            {   
+                saveDesign = false;
+                // StartCoroutine(saveTask());
+                saveTask();
+            }
+        }
 
 }
 }

@@ -21,6 +21,7 @@ public class LoadData : MonoBehaviour
     dataStore Task_B= new dataStore();
     dataStore userTask_A = new dataStore();
     dataStore userTask_B = new dataStore();
+    public dataStore[] dataS = new dataStore[6];
     void Start()
     {
         // path = Application.persistentDataPath + "/" + filename;
@@ -57,18 +58,14 @@ public class LoadData : MonoBehaviour
     
     public void SaveData()
     {
-        string contents = JsonUtility.ToJson(taskData, true);
+        string contents = JsonHelper.ToJson(dataS, true);
         System.IO.File.WriteAllText(path , contents);
-
     }
 
-    public dataStore[] ReadData()
+    public void ReadData()
     {   
-        dataStore[] dataS = new dataStore[6];
         string contents = System.IO.File.ReadAllText(path);
-        dataS = JsonHelper.FromJson<dataStore>(contents);
-        return(dataS);
-        
+        dataS = JsonHelper.FromJson<dataStore>(contents);        
     }
     
 }
