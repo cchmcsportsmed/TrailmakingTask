@@ -114,8 +114,7 @@ public class TrailmakingController : MonoBehaviour
         clearframe();
         gui.showGUI();
     }
-    
-    public IEnumerator saveTask()
+public IEnumerator saveTask()
     {
         int ix = 2+currentTask;
         print(ix);
@@ -130,8 +129,8 @@ public class TrailmakingController : MonoBehaviour
         clearframe();
         dataLoader.SaveData();
     }
-    
-    // Update is called once per frame
+ 
+ // Update is called once per frame
     void Update()
     {
         //play mode
