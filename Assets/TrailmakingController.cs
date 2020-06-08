@@ -36,7 +36,13 @@ public class TrailmakingController : MonoBehaviour
     public dataStore[] dataS = new dataStore[6];
     public bool designmode = false;
 
+    private GameObject desObject;
+    private bool isHeld = false;
+
     public int NumPoints;
+    float zPos;
+    float startposX;
+    float startposy;
     
     public void startTask()
     {   
@@ -168,7 +174,51 @@ public class TrailmakingController : MonoBehaviour
 
         if (designmode)
         {
-            print("Yipee");
-        }
+            Vector3 mousePos;
+            mousePos = Input.mousePosition;
+            // if no object is being held
+            if(!isHeld)
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                
+            
+                if (Physics.Raycast(ray, out hit, raycastMask) && Input.GetMouseButton(0))
+                {   
+                    print("Hit Target");
+                    desObject = hit.collider.gameObject; 
+
+
+
+                    isHeld = true;
+                    zPos = desObject.transform.position.z - Camera.main.transform.position.z;
+                    mousePos.z = zPos ;
+                    mousePos = Camera.main.ScreenToWorldPoint(mousePos);
+
+                    startposX=mousePos.x - desObject.transform.position.x;
+                    startposy=mousePos.y - desObject.transform.position.y;
+
+                    print("zPos = "+zPos);
+                }
+            }
+            else
+            {   
+                    if (Input.GetMouseButton(0))
+                    {
+                        mousePos.z = zPos;
+                        mousePos = Camera.main.ScreenToWorldPoint(mousePos);
+                        desObject.transform.position = new Vector3(mousePos.x - startposX, mousePos.y - startposy, zPos + Camera.main.transform.position.z);                    
+
+                        // print("Name : " + desObject.name + " Position: " +desObject.transform.position);
+                        print(" Target Locked and Current Mousr position : " + Input.mousePosition + " and In world : "+ mousePos.ToString("f8"));
+                    }
+                    else
+                    {
+                        isHeld = false;
+                    } 
+            }
+
     }
+
+}
 }

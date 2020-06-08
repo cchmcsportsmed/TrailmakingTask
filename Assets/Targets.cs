@@ -8,11 +8,11 @@ public class Targets
     public List<Vector3> targetPositions;
     public int currentTask=0;
     public GameObject targetPrefab;
-    public List<GameObject> targets;
+    // public List<GameObject> targets;
     public Canvas canvas;
     public GameObject panel;
     List<string> letters  = new List<string> { "A", "B", "C", "D", "E", "F", "G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
-
+    public List<GameObject> targets = new List<GameObject>();
     public void render()
     {   
         int count = targetPositions.Count;
@@ -31,7 +31,7 @@ public class Targets
 
     public void display(int start, int count, bool prLetters)
     {
-        targets = new List<GameObject>();
+        // targets = new List<GameObject>();
         for (int i = start; i < count; i++)
         {
             GameObject newTarget = GameObject.Instantiate(targetPrefab);
