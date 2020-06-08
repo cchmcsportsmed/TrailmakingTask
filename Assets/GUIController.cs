@@ -51,12 +51,14 @@ public class GUIController : MonoBehaviour {
         if(ControlPanel.activeSelf)
         {
             ControlPanel.SetActive(false);
-            UserPanel.SetActive(true);    
+            UserPanel.SetActive(true);
+            task.designmode = false;    
         } 
         else
         {
             ControlPanel.SetActive(true);
             UserPanel.SetActive(false);
+            task.designmode = true;
         }
         
     }

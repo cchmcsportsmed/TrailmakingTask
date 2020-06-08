@@ -48,7 +48,7 @@ public class TrailmakingController : MonoBehaviour
     public void startTask()
     {   
         dataS = dataLoader.dataS;
-        print(dataS[currentTask].positions.Count);
+    
         taskStarted = false;
         taskTime = 0;
         canStart = true;
@@ -72,8 +72,7 @@ public class TrailmakingController : MonoBehaviour
             taskInitialized = false;
             
         }
-        print(dataS[currentTask].positions.Count);
-
+        
         TaskTargets.canvas = canvas;
         TaskTargets.panel = GamePanel;
         TaskTargets.targetPrefab = targetPrefab;
@@ -116,18 +115,19 @@ public class TrailmakingController : MonoBehaviour
         gui.showGUI();
     }
     
-    public void saveTask()
+    public IEnumerator saveTask()
     {
         int ix = 2+currentTask;
         print(ix);
         print("saved");
-        // yield return gui.showOverlay(3, "New task design saved");
+        yield return gui.showOverlay(3, "New task design saved");
         dataS[ix].positions.Clear();
         foreach(GameObject target in targets)
         {
             dataS[ix].positions.Add(target.transform.position);
         }
-        targets.Clear();
+        // targets.Clear();
+        clearframe();
         dataLoader.SaveData();
     }
     
@@ -156,13 +156,12 @@ public class TrailmakingController : MonoBehaviour
                         output += mouseObj.transform.position[i].ToString("f4");
                         if (i < 2) output += ",";
                     }
-                    print(output);
+                    // print(output);
                     RaycastHit hit;
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                     if (Physics.Raycast(ray, out hit, raycastMask))
                     {
                         data.Append(Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane)) + ",");
-                        //print("Hit a target.");
                         if (hit.collider.gameObject != null)
                         {
                             Text targetText = hit.collider.gameObject.transform.Find("Text").GetComponent<Text>();
@@ -210,8 +209,6 @@ public class TrailmakingController : MonoBehaviour
 
                     startposX=mousePos.x - desObject.transform.position.x;
                     startposy=mousePos.y - desObject.transform.position.y;
-
-                    // print("zPos = "+zPos);
                 }
             }
             else
@@ -228,8 +225,7 @@ public class TrailmakingController : MonoBehaviour
             if (saveDesign == true)
             {   
                 saveDesign = false;
-                // StartCoroutine(saveTask());
-                saveTask();
+                StartCoroutine(saveTask());
             }
         }
 
