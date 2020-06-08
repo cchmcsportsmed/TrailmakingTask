@@ -179,7 +179,8 @@ public class TrailmakingController : MonoBehaviour
                                 
                                  var sprite= hit.collider.gameObject.GetComponent<SpriteRenderer>();
                                 if (targetText.text == targetsSequence[ctr])
-                                {   print("Actual " +targetText.text + "Expected "+ targetsSequence[ctr]);
+                                {   
+                                    print("Actual " +targetText.text + "Expected "+ targetsSequence[ctr]);
                                     sprite.color = new Color(0 ,255 ,0);
                                     hitTargets.Add(hit.collider.gameObject); // add target to list only if hit in correct sequence
                                     ctr++;
