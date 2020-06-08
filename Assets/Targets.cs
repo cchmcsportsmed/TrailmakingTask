@@ -13,6 +13,7 @@ public class Targets
     public GameObject panel;
     List<string> letters  = new List<string> { "A", "B", "C", "D", "E", "F", "G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
     public List<GameObject> targets = new List<GameObject>();
+    public List<string> targetsSequence = new List<string>();
     public void render()
     {   
         int count = targetPositions.Count;
@@ -26,6 +27,15 @@ public class Targets
         else
         {
             display(start,count,false);
+        }
+
+        for(int i =1; i <= count; i++)
+        {
+            targetsSequence.Add(i.ToString());
+            if(currentTask == 1 || currentTask == 3)
+            {
+                targetsSequence.Add(letters[i-1]);
+            }
         }
     }
 

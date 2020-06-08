@@ -18,6 +18,7 @@ public class TrailmakingController : MonoBehaviour
     public LayerMask raycastMask;
     StringBuilder data;
     public List<GameObject> targets;
+    private List<string> targetsSequence;
     public List<Vector3> targetPosTaskA;
     public List<Vector3> targetPosTaskB;
     public List<Vector3> targetPos_PA;
@@ -44,17 +45,18 @@ public class TrailmakingController : MonoBehaviour
     float startposX;
     float startposy;
     public bool saveDesign = false;
+    public int ctr=0;
     
     public void startTask()
     {   
         dataS = dataLoader.dataS;
-    
+        ctr=0;
         taskStarted = false;
         taskTime = 0;
         canStart = true;
         data = new StringBuilder();
         hitTargets = new List<GameObject>();
-        mouseObj.GetComponent<TrailRenderer>().Clear();
+        clearTrail();
         taskInitialized = true;
 
         // Render targets 
@@ -70,14 +72,15 @@ public class TrailmakingController : MonoBehaviour
             int i =NumPoints;
             pattern.RemoveRange(NumPoints, pattern.Count - NumPoints);
             taskInitialized = false;
-            
         }
+        
         
         TaskTargets.canvas = canvas;
         TaskTargets.panel = GamePanel;
         TaskTargets.targetPrefab = targetPrefab;
         TaskTargets.render();
         targets = TaskTargets.targets;
+        targetsSequence = TaskTargets.targetsSequence;
 
         writer.createFile();
         //writer.setFileName(fileName);
@@ -94,7 +97,7 @@ public class TrailmakingController : MonoBehaviour
             }
         }
     }
-    
+    // Clear target posints and trial from the screen
     public void clearframe()
     {
          while (targets.Count > 0)
@@ -103,6 +106,11 @@ public class TrailmakingController : MonoBehaviour
             targets.RemoveAt(0);
             Destroy(target);
         }
+        clearTrail();
+    }
+    // Call functiont to remove the trail from the screen
+    public void clearTrail()
+    {
         mouseObj.GetComponent<TrailRenderer>().Clear();
     }
     public IEnumerator endTask()
@@ -114,7 +122,7 @@ public class TrailmakingController : MonoBehaviour
         clearframe();
         gui.showGUI();
     }
-public IEnumerator saveTask()
+    public IEnumerator saveTask()
     {
         int ix = 2+currentTask;
         print(ix);
@@ -155,7 +163,9 @@ public IEnumerator saveTask()
                         output += mouseObj.transform.position[i].ToString("f4");
                         if (i < 2) output += ",";
                     }
+                    
                     // print(output);
+                    // Detect collision of mouse with targets
                     RaycastHit hit;
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                     if (Physics.Raycast(ray, out hit, raycastMask))
@@ -166,16 +176,29 @@ public IEnumerator saveTask()
                             Text targetText = hit.collider.gameObject.transform.Find("Text").GetComponent<Text>();
                             if (!hitTargets.Contains(hit.collider.gameObject))
                             {
-                                hitTargets.Add(hit.collider.gameObject);
+                                
+                                 var sprite= hit.collider.gameObject.GetComponent<SpriteRenderer>();
+                                if (targetText.text == targetsSequence[ctr])
+                                {   print("Actual " +targetText.text + "Expected "+ targetsSequence[ctr]);
+                                    sprite.color = new Color(0 ,255 ,0);
+                                    hitTargets.Add(hit.collider.gameObject); // add target to list only if hit in correct sequence
+                                    ctr++;
+                                }
+                                else
+                                {   
+                                    print("Actual " +targetText.text + "Expected "+ targetsSequence[ctr]);
+                                    sprite.color = new Color(255 ,0 ,0);
+                                }
+                                
+                                
                                 if (targetText != null)
                                 {
-                                    int numTargets = 1;
-                                    numTargets = targets.Count;
-                                    if (hitTargets.Count == numTargets)
+                                    if (hitTargets.Count == targets.Count)
                                     {
                                         StartCoroutine(endTask());
                                     }
                                 }
+                                
                             }
                         }
                     }
@@ -192,21 +215,15 @@ public IEnumerator saveTask()
             {
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                
-            
                 if (Physics.Raycast(ray, out hit, raycastMask) && Input.GetMouseButton(0))
                 {   
                     // print("Hit Target");
                     desObject = hit.collider.gameObject; 
-
-
-
                     isHeld = true;
                     zPos = desObject.transform.position.z - Camera.main.transform.position.z;
                     mousePos.z = zPos ;
                     mousePos = Camera.main.ScreenToWorldPoint(mousePos);
-
-                    startposX=mousePos.x - desObject.transform.position.x;
+                    startposX=mousePos.x - desObject.transform.position.x; // To prevent snapping of grabebd object
                     startposy=mousePos.y - desObject.transform.position.y;
                 }
             }
@@ -220,13 +237,11 @@ public IEnumerator saveTask()
                     }
                     else    {isHeld = false;} 
             }
-
             if (saveDesign == true)
             {   
                 saveDesign = false;
                 StartCoroutine(saveTask());
             }
         }
-
-}
+    }
 }
