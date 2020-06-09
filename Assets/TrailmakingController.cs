@@ -17,7 +17,8 @@ public class TrailmakingController : MonoBehaviour
     public LayerMask raycastMask;
     StringBuilder data;
     public List<GameObject> targets;
-    public List<Vector3> targetPos;
+    private List<string> targetsSequence;
+    public List<Vector3> targetPosTaskA;
     public List<Vector3> targetPosTaskB;
     public List<Vector3> targetPos_PA;
     public List<Vector3> targetPos_PB;
@@ -29,116 +30,57 @@ public class TrailmakingController : MonoBehaviour
     bool taskInitialized = false;
     public GUIController gui;
     public List<GameObject> hitTargets;
-    List<string> letters  = new List<string> { "A", "B", "C", "D", "E", "F", "G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
+    private GameObject wrongHit;
     // Use this for initialization
-    public void startTask()
+    public LoadData dataLoader;
+    public dataStore[] dataS = new dataStore[6];
+    public bool designmode = false;
+    private GameObject desObject;
+    private bool isHeld = false;
+    public int NumPoints;
+    float zPos;
+    float startposX;
+    float startposy;
+    public bool saveDesign = false;
+    public int ctr;
+    
+    public void initialize()
     {
+        dataS = dataLoader.dataS; // contains the Practise data [0, 1], default task data [2, 3] and the user task data  respectively
+        ctr=0;
         taskStarted = false;
         taskTime = 0;
         canStart = true;
         data = new StringBuilder();
         hitTargets = new List<GameObject>();
-        mouseObj.GetComponent<TrailRenderer>().Clear();
-        if (currentTask ==0)
+        clearTrail();
+        taskInitialized = true;
+    }
+    public void startTask()
+    {   
+        initialize();
+        // Render targets 
+        Targets TaskTargets = new Targets();
+        TaskTargets.currentTask = currentTask;
+        
+        List<Vector3> pattern = new List<Vector3>(dataS[currentTask].positions); // create a new list.
+        // pattern = dataS[currentTask].positions;
+        TaskTargets.targetPositions = pattern;
+
+        if (designmode)
         {
-            targets = new List<GameObject>();
-            for (int i = 0; i < targetPos.Count; i++)
-            {
-                GameObject newTarget = Instantiate(targetPrefab);
-                Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-                //Target Text
-                targetText.text = (i + 1).ToString();
-                //Target Position
-                Vector3 newTargetPos = Vector3.zero;
-                newTargetPos = targetPos[i];
-                newTargetPos.z = Camera.main.nearClipPlane;
-                newTarget.transform.position = newTargetPos;
-                newTarget.transform.parent = canvas.transform;
-                targets.Add(newTarget);
-            }
+            int i =NumPoints;
+            pattern.RemoveRange(NumPoints, pattern.Count - NumPoints);
+            taskInitialized = false;
         }
-        else if (currentTask ==1)
-        {
-            for (int i = 0; i < taskBNumbers; i++)
-            {
-                GameObject newTarget = Instantiate(targetPrefab);
-                Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-                //Target Text
-                targetText.text = (i + 1).ToString();
-                //Target Position
-                Vector3 newTargetPos = Vector3.zero;
-                newTargetPos = targetPosTaskB[i];
-                newTargetPos.z = Camera.main.nearClipPlane;
-                newTarget.transform.position = newTargetPos;
-                newTarget.transform.parent = canvas.transform;
-                targets.Add(newTarget);
-            }
-            for (int i = 0; i < targetPosTaskB.Count - taskBNumbers; i++)
-            {
-                GameObject newTarget = Instantiate(targetPrefab);
-                Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-                //Target Text
-                targetText.text = letters[i];
-                //Target Position
-                Vector3 newTargetPos = Vector3.zero;
-                newTargetPos = targetPosTaskB[taskBNumbers+i];
-                newTargetPos.z = Camera.main.nearClipPlane;
-                newTarget.transform.position = newTargetPos;
-                newTarget.transform.parent = canvas.transform;
-                targets.Add(newTarget);
-            }
-        }
-        else if (currentTask == 2)
-            {
-                targets = new List<GameObject>();
-                for (int i = 0; i < targetPos_PA.Count; i++)
-                {
-                    GameObject newTarget = Instantiate(targetPrefab);
-                    Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-                    //Target Text
-                    targetText.text = (i + 1).ToString();
-                    //Target Position
-                    Vector3 newTargetPos = Vector3.zero;
-                    newTargetPos = targetPos_PA[i];
-                    newTargetPos.z = Camera.main.nearClipPlane;
-                    newTarget.transform.position = newTargetPos;
-                    newTarget.transform.parent = canvas.transform;
-                    targets.Add(newTarget);
-                }
-            }
-        else if (currentTask == 3)
-        {
-            for (int i = 0; i < (taskBNumbers/3); i++)
-            {
-                GameObject newTarget = Instantiate(targetPrefab);
-                Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-                //Target Text
-                targetText.text = (i + 1).ToString();
-                //Target Position
-                Vector3 newTargetPos = Vector3.zero;
-                newTargetPos = targetPos_PB[i];
-                newTargetPos.z = Camera.main.nearClipPlane;
-                newTarget.transform.position = newTargetPos;
-                newTarget.transform.parent = canvas.transform;
-                targets.Add(newTarget);
-            }
-            for (int i = 0; i < targetPos_PB.Count - (taskBNumbers / 3); i++)
-            {
-                GameObject newTarget = Instantiate(targetPrefab);
-                Text targetText = newTarget.transform.Find("Text").GetComponent<Text>();
-                //Target Text
-                targetText.text = letters[i];
-                //Target Position
-                Vector3 newTargetPos = Vector3.zero;
-                newTargetPos = targetPos_PB[(taskBNumbers / 3) + i];
-                newTargetPos.z = Camera.main.nearClipPlane;
-                newTarget.transform.position = newTargetPos;
-                newTarget.transform.parent = canvas.transform;
-                targets.Add(newTarget);
-            }
-        }
+
+        TaskTargets.canvas = canvas;
+        TaskTargets.targetPrefab = targetPrefab;
+        TaskTargets.render();
+        targets = TaskTargets.targets;
+        targetsSequence = TaskTargets.targetsSequence;
+
         writer.createFile();
-        //writer.setFileName(fileName);
         foreach (string item in header)
         {
             writer.addToCSV(item);
@@ -151,18 +93,22 @@ public class TrailmakingController : MonoBehaviour
                 writer.addToCSV("\n");
             }
         }
-        taskInitialized = true;
-        for (int i=0;i<targets.Count;i++)
+    }
+    // Clear target points and trail from the screen
+    public void clearframe()
+    {
+         while (targets.Count > 0)
         {
-            Vector3 targetPos = Camera.main.ScreenToWorldPoint(targets[i].transform.position);
-            string output = "Target "+(i+1).ToString()+ ":";
-            for (int x = 0; x< 3; x++)
-            {
-                output += targetPos[x].ToString("f4");
-                if (x < 2) output += ",";
-            }
-            print(output);
+            GameObject target = targets[0];
+            targets.RemoveAt(0);
+            Destroy(target);
         }
+        clearTrail();
+    }
+    // Call functiont to remove the trail from the screen
+    public void clearTrail()
+    {
+        mouseObj.GetComponent<TrailRenderer>().Clear();
     }
     public IEnumerator endTask()
     {
@@ -170,69 +116,133 @@ public class TrailmakingController : MonoBehaviour
         taskStarted = false;
         writer.saveData();
         taskInitialized = false;
-        while (targets.Count > 0)
-        {
-            GameObject target = targets[0];
-            targets.RemoveAt(0);
-            Destroy(target);
-        }
-        mouseObj.GetComponent<TrailRenderer>().Clear();
+        clearframe();
         gui.showGUI();
     }
-    // Update is called once per frame
+    public IEnumerator saveTask()
+    {
+        int ix = 2+currentTask;
+        dataS[ix].positions.Clear();
+        foreach(GameObject target in targets)
+        {
+            dataS[ix].positions.Add(target.transform.position);
+        }
+        // targets.Clear();
+        clearframe();
+        yield return gui.showOverlay(3, "New task design saved");
+        dataLoader.SaveData();
+    }
+ 
+ // Update is called once per frame
     void Update()
-    {if (taskInitialized) {
+    {
+        //play mode
+        if (taskInitialized) 
+        {
             if (Input.GetMouseButton(0))
             {
                 if (!taskStarted && canStart)
                 {
-                    //print("Go!");
                     taskStarted = true;
                     canStart = false;
                 }
                 else if (taskStarted)
                 {
+                    // generate a trail that follows the mouse when the left button is clicked
                     mouseObj.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
                     taskTime += Time.deltaTime;
-                    writer.addToCSV(taskTime.ToString() + "," + mouseObj.transform.position.x.ToString() + "," + mouseObj.transform.position.y.ToString() + "\n");
+                    Vector3 savePos = Camera.main.WorldToScreenPoint(mouseObj.transform.position); // Task coordinates in the screen coordinates.
+                    writer.addToCSV(taskTime.ToString() + "," + savePos.x.ToString("f0") + "," + savePos.y.ToString("f0") + "\n"); // save cursor coordiantes in current frame to the output
                     string output = "";
                     for (int i = 0; i < 3; i++)
                     {
                         output += mouseObj.transform.position[i].ToString("f4");
                         if (i < 2) output += ",";
                     }
-                    print(output);
+                    
+                    // print(output);
+                    // Detect collision of mouse with targets
                     RaycastHit hit;
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                     if (Physics.Raycast(ray, out hit, raycastMask))
                     {
                         data.Append(Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane)) + ",");
-                        //print("Hit a target.");
                         if (hit.collider.gameObject != null)
                         {
                             Text targetText = hit.collider.gameObject.transform.Find("Text").GetComponent<Text>();
                             if (!hitTargets.Contains(hit.collider.gameObject))
                             {
-                                hitTargets.Add(hit.collider.gameObject);
+                                if(wrongHit != null)
+                                {
+                                    var spr = wrongHit.gameObject.GetComponent<SpriteRenderer>(); 
+                                    spr.color = new Color(255 ,255 ,255); // change the color of the wrong hit back to white
+                                    wrongHit = null; //reset the wrong hit
+                                }
+                                 var sprite= hit.collider.gameObject.GetComponent<SpriteRenderer>();
+                                if (targetText.text == targetsSequence[ctr])
+                                {   
+                                    sprite.color = new Color(0 ,255 ,0); // Change color of correctly hit target to green
+                                    hitTargets.Add(hit.collider.gameObject); // add target to list only if hit in correct sequence
+                                    ctr++;
+                                    
+                                }
+                                else
+                                {   
+                                    sprite.color = new Color(255 ,0 ,0); // Change color of wrongly hit target to red
+                                    wrongHit = hit.collider.gameObject;
+                                }
+                                
+                                
                                 if (targetText != null)
                                 {
-                                    int numTargets;
-                                    if (currentTask == 0) { numTargets = targetPos.Count; }
-                                    else if (currentTask == 1) { numTargets = targetPosTaskB.Count; }
-                                    else if (currentTask == 2) { numTargets = targetPos_PA.Count; }
-                                    else if (currentTask == 3) { numTargets = targetPos_PB.Count; }
-                                    else { numTargets = 1; }
-                                    //print(targetText.text);
-                                    if (hitTargets.Count == numTargets)
+                                    if (hitTargets.Count == targets.Count)
                                     {
-                                        //print("Hit final target.");
                                         StartCoroutine(endTask());
                                     }
                                 }
+                                
                             }
                         }
                     }
                 }
+            }
+        }
+        // design level
+        if (designmode)
+        {
+            Vector3 mousePos;
+            mousePos = Input.mousePosition;
+            // if no object is being held
+            if(!isHeld)
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit, raycastMask) && Input.GetMouseButton(0))
+                {   
+                    // print("Hit Target");
+                    desObject = hit.collider.gameObject; 
+                    isHeld = true;
+                    zPos = desObject.transform.position.z - Camera.main.transform.position.z;
+                    mousePos.z = zPos ;
+                    mousePos = Camera.main.ScreenToWorldPoint(mousePos);
+                    startposX=mousePos.x - desObject.transform.position.x; // To prevent snapping of grabebd object
+                    startposy=mousePos.y - desObject.transform.position.y;
+                }
+            }
+            else
+            {   
+                    if (Input.GetMouseButton(0))
+                    {
+                        mousePos.z = zPos;
+                        mousePos = Camera.main.ScreenToWorldPoint(mousePos);
+                        desObject.transform.position = new Vector3(mousePos.x - startposX, mousePos.y - startposy, zPos + Camera.main.transform.position.z);     // drag target around               
+                    }
+                    else    {isHeld = false;} 
+            }
+            if (saveDesign == true)
+            {   
+                saveDesign = false;
+                StartCoroutine(saveTask());
             }
         }
     }

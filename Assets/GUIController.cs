@@ -6,26 +6,31 @@ using UnityEngine.UI;
 public class GUIController : MonoBehaviour {
 
     public string subjectID = "";
-    public GameObject canvas;
+    public GameObject UserPanel;
+    public GameObject ControlPanel;
+    public GameObject GamePanel;
     public TrailmakingController task;
-    public GameObject overlay;
-    public Text overlayText;
+    public Text statusMsg;
+    public int customDesign = 0;
+
     // Use this for initialization
     public IEnumerator showOverlay(float duration, string text)
     {
-        overlayText.text = text;
-        overlay.SetActive(true);
+        statusMsg.text = text;
+        statusMsg.gameObject.SetActive(true);
         yield return new WaitForSeconds(duration);
-        overlay.SetActive(false);
+        statusMsg.gameObject.SetActive(false);
     }
     public void startTask(int taskID)
     {
+        bool toggle = this.transform.Find("UserPanel/customDesign").gameObject.GetComponent<Toggle>().isOn;
+        if(toggle) {customDesign = 2;} else {customDesign = 0;}; 
         if (subjectID != "")
         {
-            task.currentTask = taskID;
-           
+            this.transform.Find("ControlCanvas/Settings").gameObject.SetActive(false);
+            task.currentTask = taskID + customDesign;
             task.writer.trialID+=1;
-            canvas.SetActive(false);
+            UserPanel.SetActive(false);
             task.writer.setFileName();
             task.startTask();
         }
@@ -35,12 +40,26 @@ public class GUIController : MonoBehaviour {
     {
         subjectID = newID;
         task.writer.subID = subjectID;
-        
     }
     public void showGUI()
     {
-        canvas.SetActive(true);
+        UserPanel.SetActive(true);
+        this.transform.Find("ControlCanvas/Settings").gameObject.SetActive(true);
     }
-    
-
+     public void showSettings()
+    {
+        if(ControlPanel.activeSelf)
+        {
+            ControlPanel.SetActive(false);
+            UserPanel.SetActive(true);
+            task.designmode = false;    
+        } 
+        else
+        {
+            ControlPanel.SetActive(true);
+            UserPanel.SetActive(false);
+            task.designmode = true;
+        }
+    }
 }
+   

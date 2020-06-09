@@ -30,7 +30,6 @@ public class DataWriter : MonoBehaviour
     }
     public void setFileName()
     {
-        print(Application.dataPath);
         fileName=Application.persistentDataPath+ "\\Subject_" + subID.ToString() + "_Trial_" + trialID.ToString() + ".dat";
     }
 #if WINDOWS_UWP
@@ -76,12 +75,10 @@ public class DataWriter : MonoBehaviour
     {
         print("saving data");
         FileStream fileStream = File.Open(fileName, FileMode.OpenOrCreate);
-        //fileStream.Close();
         data taskData = new data();
         taskData.saveData = csv.ToString();
         BinaryFormatter serializer = new BinaryFormatter();
         serializer.Serialize(fileStream, taskData);
-        //File.WriteAllText(fileName, csv.ToString());
         fileStream.Close();
     }
     [Serializable]
@@ -90,5 +87,4 @@ public class DataWriter : MonoBehaviour
         public string saveData;
     }
 #endif
-
 }
