@@ -27,8 +27,8 @@ public class GUIController : MonoBehaviour {
         if(toggle) {customDesign = 2;} else {customDesign = 0;}; 
         if (subjectID != "")
         {
+            this.transform.Find("ControlCanvas/Settings").gameObject.SetActive(false);
             task.currentTask = taskID + customDesign;
-           
             task.writer.trialID+=1;
             UserPanel.SetActive(false);
             task.writer.setFileName();
@@ -40,11 +40,11 @@ public class GUIController : MonoBehaviour {
     {
         subjectID = newID;
         task.writer.subID = subjectID;
-        
     }
     public void showGUI()
     {
         UserPanel.SetActive(true);
+        this.transform.Find("ControlCanvas/Settings").gameObject.SetActive(true);
     }
      public void showSettings()
     {
@@ -60,8 +60,6 @@ public class GUIController : MonoBehaviour {
             UserPanel.SetActive(false);
             task.designmode = true;
         }
-        
     }
-
 }
    

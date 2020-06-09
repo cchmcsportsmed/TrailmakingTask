@@ -125,8 +125,6 @@ public class TrailmakingController : MonoBehaviour
     public IEnumerator saveTask()
     {
         int ix = 2+currentTask;
-        print(ix);
-        print("saved");
         yield return gui.showOverlay(3, "New task design saved");
         dataS[ix].positions.Clear();
         foreach(GameObject target in targets)
