@@ -31,6 +31,7 @@ public class TrailmakingController : MonoBehaviour
     bool taskInitialized = false;
     public GUIController gui;
     public List<GameObject> hitTargets;
+    private GameObject wrongHit;
     List<string> letters  = new List<string> { "A", "B", "C", "D", "E", "F", "G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
     // Use this for initialization
     public LoadData dataLoader;
@@ -125,7 +126,6 @@ public class TrailmakingController : MonoBehaviour
     public IEnumerator saveTask()
     {
         int ix = 2+currentTask;
-        yield return gui.showOverlay(3, "New task design saved");
         dataS[ix].positions.Clear();
         foreach(GameObject target in targets)
         {
@@ -133,6 +133,7 @@ public class TrailmakingController : MonoBehaviour
         }
         // targets.Clear();
         clearframe();
+        yield return gui.showOverlay(3, "New task design saved");
         dataLoader.SaveData();
     }
  
@@ -174,19 +175,24 @@ public class TrailmakingController : MonoBehaviour
                             Text targetText = hit.collider.gameObject.transform.Find("Text").GetComponent<Text>();
                             if (!hitTargets.Contains(hit.collider.gameObject))
                             {
-                                
+                                if(wrongHit != null)
+                                {
+                                    var spr = wrongHit.gameObject.GetComponent<SpriteRenderer>(); 
+                                    spr.color = new Color(255 ,255 ,255); // change the color of the wrong hit back to white
+                                    wrongHit = null; //reset the wrong hit
+                                }
                                  var sprite= hit.collider.gameObject.GetComponent<SpriteRenderer>();
                                 if (targetText.text == targetsSequence[ctr])
                                 {   
-                                    print("Actual " +targetText.text + "Expected "+ targetsSequence[ctr]);
-                                    sprite.color = new Color(0 ,255 ,0);
+                                    sprite.color = new Color(0 ,255 ,0); // Change color of correctly hit target to green
                                     hitTargets.Add(hit.collider.gameObject); // add target to list only if hit in correct sequence
                                     ctr++;
+                                    
                                 }
                                 else
                                 {   
-                                    print("Actual " +targetText.text + "Expected "+ targetsSequence[ctr]);
-                                    sprite.color = new Color(255 ,0 ,0);
+                                    sprite.color = new Color(255 ,0 ,0); // Change color of wrongly hit target to red
+                                    wrongHit = hit.collider.gameObject;
                                 }
                                 
                                 
@@ -232,7 +238,7 @@ public class TrailmakingController : MonoBehaviour
                     {
                         mousePos.z = zPos;
                         mousePos = Camera.main.ScreenToWorldPoint(mousePos);
-                        desObject.transform.position = new Vector3(mousePos.x - startposX, mousePos.y - startposy, zPos + Camera.main.transform.position.z);                    
+                        desObject.transform.position = new Vector3(mousePos.x - startposX, mousePos.y - startposy, zPos + Camera.main.transform.position.z);     // drag target around               
                     }
                     else    {isHeld = false;} 
             }
