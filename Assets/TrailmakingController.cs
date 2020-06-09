@@ -11,7 +11,6 @@ public class TrailmakingController : MonoBehaviour
     public List<float> yRange;
     public GameObject mouseObj;
     public Canvas canvas;
-    public GameObject GamePanel;
     public float taskTime;
     bool taskStarted;
     bool canStart = true;
@@ -32,25 +31,22 @@ public class TrailmakingController : MonoBehaviour
     public GUIController gui;
     public List<GameObject> hitTargets;
     private GameObject wrongHit;
-    List<string> letters  = new List<string> { "A", "B", "C", "D", "E", "F", "G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
     // Use this for initialization
     public LoadData dataLoader;
     public dataStore[] dataS = new dataStore[6];
     public bool designmode = false;
-
     private GameObject desObject;
     private bool isHeld = false;
-
     public int NumPoints;
     float zPos;
     float startposX;
     float startposy;
     public bool saveDesign = false;
-    public int ctr=0;
+    public int ctr;
     
-    public void startTask()
-    {   
-        dataS = dataLoader.dataS;
+    public void initialize()
+    {
+        dataS = dataLoader.dataS; // contains the Practise data [0, 1], default task data [2, 3] and the user task data  respectively
         ctr=0;
         taskStarted = false;
         taskTime = 0;
@@ -59,7 +55,10 @@ public class TrailmakingController : MonoBehaviour
         hitTargets = new List<GameObject>();
         clearTrail();
         taskInitialized = true;
-
+    }
+    public void startTask()
+    {   
+        initialize();
         // Render targets 
         Targets TaskTargets = new Targets();
         TaskTargets.currentTask = currentTask;
@@ -74,17 +73,14 @@ public class TrailmakingController : MonoBehaviour
             pattern.RemoveRange(NumPoints, pattern.Count - NumPoints);
             taskInitialized = false;
         }
-        
-        
+
         TaskTargets.canvas = canvas;
-        TaskTargets.panel = GamePanel;
         TaskTargets.targetPrefab = targetPrefab;
         TaskTargets.render();
         targets = TaskTargets.targets;
         targetsSequence = TaskTargets.targetsSequence;
 
         writer.createFile();
-        //writer.setFileName(fileName);
         foreach (string item in header)
         {
             writer.addToCSV(item);
@@ -98,7 +94,7 @@ public class TrailmakingController : MonoBehaviour
             }
         }
     }
-    // Clear target posints and trial from the screen
+    // Clear target points and trail from the screen
     public void clearframe()
     {
          while (targets.Count > 0)
@@ -152,10 +148,11 @@ public class TrailmakingController : MonoBehaviour
                 }
                 else if (taskStarted)
                 {
+                    // generate a trail that follows the mouse when the left button is clicked
                     mouseObj.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
                     taskTime += Time.deltaTime;
-                    // writer.addToCSV(taskTime.ToString() + "," + mouseObj.transform.position.x.ToString() + "," + mouseObj.transform.position.y.ToString() + "\n");
-                    writer.addToCSV(taskTime.ToString() + "," + Input.mousePosition.x + "," + Input.mousePosition.y.ToString() + "\n"); // save cursor coordiantes in current frame to the output
+                    Vector3 savePos = Camera.main.WorldToScreenPoint(mouseObj.transform.position); // Task coordinates in the screen coordinates.
+                    writer.addToCSV(taskTime.ToString() + "," + savePos.x.ToString("f0") + "," + savePos.y.ToString("f0") + "\n"); // save cursor coordiantes in current frame to the output
                     string output = "";
                     for (int i = 0; i < 3; i++)
                     {

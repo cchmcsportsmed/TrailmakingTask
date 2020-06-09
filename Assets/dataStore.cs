@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿// Data class used define task type
+// Author: Manish Anand
 using System.Collections.Generic;
 using UnityEngine;
 

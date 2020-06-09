@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿// This program is used to generate new patterns by the user. 
+// The design is based off of default designs. 
+// Author : Manish Anand
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+
 
 public class PatternGenerator : MonoBehaviour
 {

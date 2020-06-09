@@ -1,4 +1,8 @@
-﻿using System.Collections;
+﻿// Public class to specify and generate a set of way points from
+// coordinate positions and task type (A or B). Contains the rendering 
+// function as well.
+// Author : Manish Anand
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +14,6 @@ public class Targets
     public GameObject targetPrefab;
     // public List<GameObject> targets;
     public Canvas canvas;
-    public GameObject panel;
     List<string> letters  = new List<string> { "A", "B", "C", "D", "E", "F", "G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
     public List<GameObject> targets = new List<GameObject>();
     public List<string> targetsSequence = new List<string>();
@@ -39,7 +42,7 @@ public class Targets
         }
     }
 
-    public void display(int start, int count, bool prLetters)
+    private void display(int start, int count, bool prLetters)
     {
         // targets = new List<GameObject>();
         for (int i = start; i < count; i++)
